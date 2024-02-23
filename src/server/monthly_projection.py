@@ -14,10 +14,10 @@ def main():
         'gender': [0], # 0 for male
 
         # Activity Factors
-        'weight_change_metric': [30],
+        'weight_change_metric': [.5], # Rate at which weight is changing in the past (1-3) weeks
         'active_calories_burned': [358],
-        'resting_calories_burned':  [1723]
-        'steps': [8659]
+        'resting_calories_burned':  [1723],
+        'steps': [8659],
         'hours_of_sleep': [8],
         
         # Diet
@@ -35,7 +35,9 @@ def main():
 
 
     # Define predictors and outcome
-    X = df[['initial_weight', 'daily_calorie_intake', 'calorie_expenditure', 'hours_of_sleep', 'body_fat_percentage', 'height', 'gender', 'weight_change_metric', 'week_count']]
+    X = df[['initial_weight', 'body_fat_percentage', 'height', 'gender',
+             'weight_change_metric', 'active_calories_burned', 'resting_calories_burned',
+              'steps', 'hours_of_sleep', 'daily_calorie_intake', 'daily_protein_intake', 'week_count', 'future_weight']]
     y = df['future_weight']
 
     # Splitting dataset into training and testing sets
