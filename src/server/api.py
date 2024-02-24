@@ -1,5 +1,6 @@
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from flask import current_app
+import pandas as pd
 resource_fields = {
     'accountID': fields.Integer(default=0),
     'name': fields.String(default=''),
@@ -55,23 +56,28 @@ class ProfileResource(Resource):
         """
         Send account data to frontend
         """
-        
-        user_data = get_account_data() # TODO
+        user_data = get_user_profile_data() # TODO
         return user_data
     
 class WeightModelResource(Resource):
-    def get(self):
-        """
-        Send model predictions to frontend
-        """
-    def put(self, current_weight, active_calories_burned, resting_calories_burned, steps, hours_of_sleep, daily_calorie_intake, daily_protein_intake, mode):
+        
+    def post(self, current_weight, active_calories_burned, resting_calories_burned, steps, hours_of_sleep, daily_calorie_intake, daily_protein_intake, mode):
+        user_body_data = get_user_body_data()
+        features = {'initial_weight': current_weight, 'height': user_body_data['height'], 'sex': user_body_data['sex'], 'weight_change_rate': user_body_data['weight_change_rate'],
+            'active_calories_burned': active_calories_burned, 'resting_calories_burned' : resting_calories_burned, 'steps': steps, 'hours_of_sleep': hours_of_sleep,
+            'daily_calorie_intake': daily_calorie_intake, 'daily_protein_intake': daily_protein_intake}
         if(mode == "weekly"):
-            current_app.config['WEEKLY_MODEL']
+            model = current_app.config['WEEKLY_MODEL']
+            features['week_count'] = get_week_count()
         elif(mode == "monthly"):
-            current_app.config['MONTHLY_MODEL']
+            model = current_app.config['MONTHLY_MODEL']
+            features['month_count'] = get_month_count()
         else:
             return None
-        get_prediction() # Gets height, sex, weight_change_rate
+        pd.DataFrame(features)
+
+        
+        return model.predict(features)
     
 def initialize_api(app):
     """
