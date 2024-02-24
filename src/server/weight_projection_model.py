@@ -25,7 +25,9 @@ class WeightProjectionModel:
             test_size (float): Proportion of the dataset to include in the test split.
             random_state (int): Controls the shuffling applied to the data before applying the split.
         """
-        features = ['initial_weight', 'body_fat_percentage', 'height', 'sex', 'weight_change_rate',
+        
+        # Possible ideas for the future: Bodyfat estimator using data of lbs lifted for certain exercises
+        features = ['initial_weight', 'height', 'sex', 'weight_change_rate', # Bodyfat percentage is not feasible for now
                     'active_calories_burned', 'resting_calories_burned', 'steps', 'hours_of_sleep',
                     'daily_calorie_intake', 'daily_protein_intake']
         if self.mode == "weekly":

@@ -1,5 +1,5 @@
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
-
+from flask import current_app
 resource_fields = {
     'accountID': fields.Integer(default=0),
     'name': fields.String(default=''),
@@ -9,11 +9,6 @@ resource_fields = {
     'sex': fields.String(default=''),
     'message': fields.String,
 }
-# Account creation page --leads to--> Homepage with home tabs and a welcome message
-# Hometabs: 1) Home 2) Workout 3) Input daily data 4) Weight projection Graph page
-# Pages: 1) Account creation page 2) Homepage 3) Workout 3) Input daily data page 4) Projections page
-
-
 
 # Note: frontend sends data to backend in the form of a "request" object
 # The request object's data can be parsed with RequestParser() and the contents will be stored in args
@@ -69,6 +64,14 @@ class WeightModelResource(Resource):
         """
         Send model predictions to frontend
         """
+    def put(self, current_weight, active_calories_burned, resting_calories_burned, steps, hours_of_sleep, daily_calorie_intake, daily_protein_intake, mode):
+        if(mode == "weekly"):
+            current_app.config['WEEKLY_MODEL']
+        elif(mode == "monthly"):
+            current_app.config['MONTHLY_MODEL']
+        else:
+            return None
+        get_prediction() # Gets height, sex, weight_change_rate
     
 def initialize_api(app):
     """

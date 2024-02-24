@@ -5,6 +5,8 @@ from api import initialize_api
 from server.weight_projection_model import WeightProjectionModel
 import atexit
 
+app = Flask(__name__)
+
 weekly_model_path = "weekly_model.joblib"
 monthly_model_path = "monthly_model.joblib"
 
@@ -59,10 +61,11 @@ def main():
     weekly_model, monthly_model = get_models(args.wnew, args.mnew)
 
     # INITIALIZE & START SERVER
-    app = Flask(__name__)
-    atexit.register(serialize_models_on_exit, weekly_model, monthly_model, weekly_model_path, monthly_model_path)
-    initialize_api(app)
-    app.run(debug=True)
+    atexit.register(serialize_models_on_exit, weekly_model, monthly_model, weekly_model_path, monthly_model_path) # Serialize models on server close
+    initialize_api(app) # Set resource endpoitns to flask app
+    app.config['WEEKLY_MODEL'] = weekly_model
+    app.config['MONTHLY_MODEL'] = monthly_model
+    app.run(debug=True) # run server
 
     # Profile's POST
     # 1. Accept data from APi endpoints
