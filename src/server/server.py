@@ -1,61 +1,55 @@
 from flask import Flask
-from flask_restful import Api, Resource, reqparse, fields, marshal_with
+import argparse
+import os
+from api import initialize_api
+from server.weight_projection_model import WeightProjectionModel
 
-app = Flask(__name__)
-api = Api(app)
+"""
+Upon server start:
+1. Load and deserialize model
+OPTIONAL: (Do this only if you want to train the model)
+1. Fetch training data from database
+2. Train model
 
-resource_fields = {
-    'accountID': fields.Integer(default=0),
-    'name': fields.String(default=''),
-    'height': fields.Float(default=0.0),
-    'weight': fields.Float(default=0.0),
-    'age': fields.Integer(default=0),
-    'sex': fields.String(default=''),
-    'message': fields.String,
-}
+Upon frontend using POST endpoint to backend:
+1. Accept data from APi endpoints
+2. Upload user data to database
 
-class Home(Resource):
-    def get(self):
-        return {"message": "BulkCut Buddy Homepage"}
+Upon frontend using PUT endpoint to backend:
+1. Accept data from API endpoints
+2. Upload user data to database
 
-class Profile(Resource):
-    def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('username', required=True, help="Username cannot be blank.")
-        parser.add_argument('password', required=True, help="Password cannot be blank.")  # Note: Ensure secure handling
-        args = parser.parse_args()
-        
-        #accountID = create_account(args['username'], args['password'])  # Create account in database
-        accountID = 123
-        return {'accountID': accountID, 'message': "Account created successfully"}, 200
+Upon frontend using GET endpoint from backend
+1. Fetch user data from database
+2. Clean data
+3. Feed data into model
+4. receive predicttion from model
+5. Send prediction to frontend
+
+Upon server close:
+1. Deserialize model
+"""
+def main():
+    parser = argparse.ArgumentParser(description="Start the Flask server with optional model initialization.")
+    parser.add_argument("--new", action="store_true", help="Force the creation of a new model regardless of existing serialized models.")
+    args = parser.parse_args()
     
-    def put(self, accountID):
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type = str)
-        parser.add_argument('height', type=int)
-        parser.add_argument('weight', type=float)
-        parser.add_argument('age', type=int)
-        parser.add_argument('sex', type=str)
-        args = parser.parse_args()
-        
-        # Logic for updating account with new information
-        return {'message': "Account updated successfully"}, 200
+    weekly_model_file_path = "weekly_model.joblib"
+    monthly_model_file_path = "monthly_model.joblib"
 
-    @marshal_with(resource_fields)
-    def get(self, accountID):
-        # Get data from DB, here is some dummy data
-        user_data = {
-            'accountID': accountID,
-            'height': 180.0,
-            'weight': 150.0,
-            'age': 25,
-            'sex': 'M',
-            'message': 'Profile data fetched successfully.'
-        }   
-        return user_data
+    app = Flask(__name__)
+    
+    if args.new or not os.path.exists(model_file_path):
+        model = WeightProjectionModel(mode="weekly")
+        print("Initialized a new model.")
+    else:
+        model = WeightProjectionModel(mode="weekly")
+        model.deserialize(model_file_path)
+        print(f"Deserialized model from {model_file_path}.")
 
-api.add_resource(Home, '/')
-api.add_resource(Profile, '/profile', '/profile/<int:accountID>')
+
+    initialize_api(app)
+    app.run(debug=True)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()
