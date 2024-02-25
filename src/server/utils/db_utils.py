@@ -1,47 +1,64 @@
-import mysql.connector
-def fetch_user_data():
+def upload_new_account(username: str, encrypted_password: str) -> int:
     """
-    Establishes a connection with the MySql server and fetches user data
+    Uploads account data to database, returns accountID of newly created account
     """
-    config = {
-        'user': 'database username',
-        'password': 'database password',
-        'host': 'localhost',
-        'database': 'our database name',
-        'raise_on_warnings': True
-    }
-    try:
-        # Establishing a connection to the database
-        cnx = mysql.connector.connect(**config)
-        cursor = cnx.cursor(dictionary=True)
+    return 0
 
-        query = """
-        SELECT 
-            initial_weight, body_fat_percentage, height, gender,
-            weight_change_metric, active_calories_burned, resting_calories_burned, steps, hours_of_sleep,
-            daily_calorie_intake, daily_protein_intake,
-            week_count,
-            future_weight
-        FROM
-            our_table_name
-        """
+def validate_new_account(username: str) -> bool:
+    """"
+    Checks if username exists in database. Return True if it does, False if it doesnt
+    """
+    return False
 
-        # Execute the query
-        cursor.execute(query)
+def update_account_data(accountID, name=None, height=None, age=None, sex=None) -> dict:
+    """
+    Uploads account data to database profile that contains accountID. Returns response ex. {'message': "Message here", 'status': 200}
+    """
+    return {}
 
-        # Fetch all rows from the query result
-        result = cursor.fetchall()
+def get_user_profile_data(accountID: int) -> dict:
+    """
+    Returns a dict of ALL data regarding accountID in the database. 
+    Returns response ex. {'data1': data1, 'data2': data2, 'message': "Message here", 'status': 200} OR
+    {'user_data': {user_data_here}, 'message': "Message here", 'status': 200} whichever ones easier
+    """
+    return {}
 
-        # Close the cursor and connection
-        cursor.close()
-        cnx.close()
+def upload_phase_data(phase_type: str, start_date: str, target_weight: float, target_date: str) -> dict:
+    """
+    Uploads phase data to database and returns response ex. {'message': "Message here", 'status': 200}
+    """
+    return {}
 
-        # If nothing was fetched into result then return an empty dict
-        if result:
-            return result[0]  # Return the first row as a dictionary
-        else:
-            return {}
+def edit_phase_data(phase_id, phase_type=None, start_date=None, target_weight=None, target_date=None) -> dict:
+    """
+    Edits the specified fields of a phase entry. Fields not provided are not updated. returns response ex. {'message': "Message here", 'status': 200}
+    """
+    return {}
 
-    except mysql.connector.Error as err:
-        print(f"Error: {err}")
-        return {}
+def delete_current_phase() -> dict:
+    """
+    Deletes most recent phase data and returns response ex. {'message': "Message here", 'status': 200}
+    """
+    return {}
+
+def get_phase_data(accountID: str) -> dict:
+    """
+    Returns all phase data, as well as a message ex. {'phase_data': {all data here}, 'message': "Message here", 'status': 200} or 
+    {'data1': data1, 'data2': data2, 'message': "Message here", 'status': 200} whatevers easier
+    """
+    return {}
+
+def upload_daily_entry(accountID, date, current_weight=None, active_calories_burned=None, resting_calories_burned=None,
+                       steps=None, hours_of_sleep=None, daily_calorie_intake=None, daily_protein_intake=None) -> dict:
+    """
+    Processes and uploads daily data entry. Returns response ex. {'message': "Message here", 'status': 200}
+    """
+    #date must be in format "%Y-%m-%d"
+    return {}
+
+def edit_daily_entry(accountID, date, current_weight=None, active_calories_burned=None, resting_calories_burned=None,
+                       steps=None, hours_of_sleep=None, daily_calorie_intake=None, daily_protein_intake=None) -> dict:
+    """
+    Edit fields to value in arguments. If argument is None, do nothing. Return response  ex. {'message': "Message here", 'status': 200}
+    """
