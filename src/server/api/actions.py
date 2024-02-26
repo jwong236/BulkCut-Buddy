@@ -2,7 +2,7 @@ from utils import validate_password, encrypt_password
 
 # PROFILERESOURCE METHODS
 
-def create_new_profile(username: str, password_hash: str) -> dict:
+def create_profile(username: str, password_hash: str) -> dict:
     """
     Creates an account entry in database using arguments, returns accountID of new account
 
@@ -28,7 +28,7 @@ def create_new_profile(username: str, password_hash: str) -> dict:
     # new_accountID = upload_new_account(username, encrypted_password)
     return {'account_id': 0, 'message': "Account created successfully", "status": 201}
 
-def get_user_profile_data(account_id: int) -> dict:
+def get_profile(account_id: int) -> dict:
     """
     Retrieves basic profile data for a given account ID. 
 
@@ -48,7 +48,7 @@ def get_user_profile_data(account_id: int) -> dict:
     """
     return {'data': {'name': "John Doe", 'height': 180.0, 'age': 30, 'sex': 1}, 'message': "Profile data retrieved successfully", 'status': 200}
 
-def upload_profile_data(account_id: int, name: str = None, height: float = None, age: int = None, sex: int = None) -> dict:
+def upload_profile(account_id: int, name: str = None, height: float = None, age: int = None, sex: int = None) -> dict:
     """
     Uploads the profile with basic profile data for a given account ID.
 
@@ -64,7 +64,7 @@ def upload_profile_data(account_id: int, name: str = None, height: float = None,
     """
     return {'message': "Profile updated successfully", "status": 200}
 
-def update_profile_data(account_id: int, username: str, password_hash: str, name: str = None, 
+def update_profile(account_id: int, username: str, password_hash: str, name: str = None, 
                         height: float = None, age: int = None, sex: int = None) -> dict:
     """
     Updates one or more basic profile data for a given account ID.
@@ -83,7 +83,7 @@ def update_profile_data(account_id: int, username: str, password_hash: str, name
     """
     return {'message': "Account data updated successfully", "status": 200}
 
-def delete_account_data(account_id: int) -> dict:
+def delete_profile(account_id: int) -> dict:
     """
     Deletes basic profile data for a given account ID.
 
@@ -103,7 +103,7 @@ def delete_account_data(account_id: int) -> dict:
 
 
 
-def upload_phase_data(account_id: int, phase_type: int, start_date: str, target_weight: float, target_date: str) -> dict:
+def create_phase(account_id: int, phase_type: int, start_date: str, target_weight: float, target_date: str) -> dict:
     """
     Creates a new phase entry in the database with phase details.
 
@@ -119,7 +119,7 @@ def upload_phase_data(account_id: int, phase_type: int, start_date: str, target_
     """
     return {'message': "Phase data uploaded successfully", "status": 201}
 
-def get_phase_data(account_id: int, phase_id: int) -> dict:
+def get_phase(account_id: int, phase_id: int) -> dict:
     """
     Retrieves details of a specific phase entry from the database based on the given account ID and phase ID.
 
@@ -135,7 +135,7 @@ def get_phase_data(account_id: int, phase_id: int) -> dict:
     """
     return {'data': {'phase_type': 0, 'start_date': "2023-01-01", 'target_weight': 75.0, 'target_date': "2023-06-01"}, 'message': "Phase data retrieved successfully", 'status': 200}
 
-def update_phase_data(account_id: int, phase_id: int, phase_type: int = None, start_date: str = None, 
+def update_phase(account_id: int, phase_id: int, phase_type: int = None, start_date: str = None, 
                       target_weight: float = None, target_date: str = None) -> dict:
     """
     Updates phase entry data for a given phase ID and account ID.
@@ -153,7 +153,7 @@ def update_phase_data(account_id: int, phase_id: int, phase_type: int = None, st
     """
     return {'message': "Phase data updated successfully", "status": 200}
 
-def delete_current_phase(account_id: int, phase_id: int) -> dict:
+def delete_phase(account_id: int, phase_id: int) -> dict:
     """
     Deletes a specific phase entry from the database based on the provided account ID and phase ID.
 

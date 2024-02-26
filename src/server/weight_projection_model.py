@@ -5,7 +5,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from joblib import dump, load
 
 class WeightProjectionModel:
-    def __init__(self, mode):
+    def __init__(self, mode: int):
         self.model = LinearRegression()
         self.mode = mode
 
@@ -14,8 +14,8 @@ class WeightProjectionModel:
         self.mse = 0.0
         self.r2 = 0.0
 
-        if mode not in ["weekly", "monthly"]:
-            raise ValueError("Mode must be 'weekly' or 'monthly'.")
+        if mode not in [0, 1]:
+            raise ValueError("Mode must be 0 for weekly or 1 for monthly.")
 
     def train(self, df: pd.DataFrame, test_size=0.2, random_state=42):
         """
@@ -26,13 +26,15 @@ class WeightProjectionModel:
             random_state (int): Controls the shuffling applied to the data before applying the split.
         """
         # Bodyfat percentage is not feasible
-        features = ['initial_weight', 'height', 'sex', 'weight_change_rate', 'phase_type',
+        features = ['initial_weight', 'height', 'sex', 'phase_type',
                     'active_calories_burned', 'resting_calories_burned', 'steps', 'hours_of_sleep', 'weight_change_rate', 
                     'daily_calorie_intake', 'daily_protein_intake']
-        if self.mode == "weekly":
+        if self.mode == 0:
             X = df[features + ['week_count']]
-        else:
+        elif self.mode == 1:
             X = df[features + ['month_count']]
+        else:
+            print("Impossible!")
         y = df['future_weight']
 
         X_train, self.X_test, y_train, self.y_test = train_test_split(X, y, test_size=test_size, random_state=random_state)
