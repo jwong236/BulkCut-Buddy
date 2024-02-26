@@ -1,7 +1,7 @@
 from flask import Flask
 import argparse
 import os
-from api import initialize_api
+from server.api.endpoints import initialize_api
 from server.weight_projection_model import WeightProjectionModel
 import atexit
 
