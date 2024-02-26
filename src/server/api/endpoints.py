@@ -16,6 +16,11 @@ resource_fields = {
     'message': fields.String,
 }"""
 
+resource_fields = {
+    'message': fields.String,
+    'status': fields.Integer
+}
+
 def initialize_api(app):
     """
     Initialize 
@@ -67,6 +72,8 @@ class ProfileResource(Resource):
         """
         parser = reqparse.RequestParser()
         parser.add_argument('account_id', type=int, required=True, help="Account ID cannot be blank.")
+        parser.add_argument('username' , type=str, store_missing=False)
+        parser.add_argument('password_hash' , type=str, store_missing=False)
         parser.add_argument('name', type=str, store_missing=False)
         parser.add_argument('height', type=float, store_missing=False)
         parser.add_argument('age', type=int, store_missing=False)
@@ -90,7 +97,7 @@ class PhaseResources(Resource):
         """
         parser = reqparse.RequestParser()
         parser.add_argument('account_id', type=int, required=True, help="Account ID cannot be blank.")
-        parser.add_argument('phase_type', type=str, required=True, choices=["bulk", "cut"], help="Projection mode must be 'bulk' or 'cut'.")
+        parser.add_argument('phase_type', type=int, required=True, choices=[0, 1], help="Projection mode must be 0 for bulk or 1 for cut.")
         parser.add_argument('start_date')
         parser.add_argument('target_weight')
         parser.add_argument('target_date')
@@ -114,12 +121,12 @@ class PhaseResources(Resource):
         parser = reqparse.RequestParser()
         parser.add_argument('account_id', type=int, required=True, help="Account ID cannot be blank.")
         parser.add_argument('phase_id', type=int, required=True, help="Phase ID cannot be blank.")
-        parser.add_argument('phase_type', type=str, required=True, choices=["bulk", "cut"], help="Projection mode must be 'bulk' or 'cut'.")
+        parser.add_argument('phase_type', type=int, required=True, choices=[0, 1], help="Projection mode must be 0 for bulk or 1 for cut.")
         parser.add_argument('start_date', store_missing=False)
         parser.add_argument('target_weight', store_missing=False)
         parser.add_argument('target_date', store_missing=False)
         args = parser.parse_args()
-        return edit_phase_data(**args)
+        return update_phase_data(**args)
 
     def delete(self):
         """
@@ -178,7 +185,7 @@ class DailyEntryResource(Resource):
         parser.add_argument('daily_calorie_intake', type=float, store_missing=False)
         parser.add_argument('daily_protein_intake', type=int, store_missing=False)
         args = parser.parse_args()
-        return edit_daily_entry(**args)
+        return update_daily_entry(**args)
     
     def delete(self):
         """
