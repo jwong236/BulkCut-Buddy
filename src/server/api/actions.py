@@ -1,37 +1,48 @@
 from utils import validate_password, encrypt_password
+from flask import current_app
 
 # PROFILERESOURCE METHODS
 
-def create_profile(username: str, password_hash: str) -> dict:
+def create_profile(username: str, password: str, db_config) -> dict:
     """
     Creates an account entry in database using arguments, returns accountID of new account
 
-    1. Validates if password meets requirements
-    2. Validates if username already exists
-    3. Encrypts password
-    4. Uploads encrypted password to database
-
     Args:
         username (str): The username of the new user.
-        password_hash (str): The hashed password for the new user.
+        password (str): The password for the new user (not pre-hashed).
+        db_config (dict): Database connection information.
 
     Returns:
         dict: {'account_id': account_id, 'message': message, "status": status}
     """
-    # Example implementation, but do whatever you want, i dont know how to upload to database
-    # if not validate_password(password):
-    #     return {'message': "Password does not meet requirements", "status": 400}
-    # if not validate_new_account(username):
-    #     return {'message': "Account with that username already exists", "status": 409}
-        
-    # encrypted_password = encrypt_password(password)
-    # new_accountID = upload_new_account(username, encrypted_password)
-    return {'account_id': 0, 'message': "Account created successfully", "status": 201}
+
+    # Implement password validation
+    if not validate_password(password):
+        return {'message': 'Invalid password', 'status': 1}
+
+    # Encrypt password using a secure algorithm
+    password_hash = create_password_hash(password)
+
+    data = [(username, password_hash)]
+    query = """
+        INSERT INTO profile (username, password_hash)
+        VALUES (%s, %s);
+    """
+
+    try:
+        response = current_app.db.execute_query(data, query, db_config)
+        if response['status'] == 0:  # Successful insertion
+            account_id = current_app.db.get_account_id(username, db_config)  # Fetch accountID
+            response['account_id'] = account_id
+    except Exception as e:
+        print(f"Error creating profile: {str(e)}")
+        response = {'message': 'Failed to create profile', 'status': 1}
+
+    return response
 
 def get_profile(account_id: int) -> dict:
     """
     Retrieves basic profile data for a given account ID. 
-
 
     Return dict should be {'data1': data1, 'data2': data2, 'message': "Profile data retrieved successfully", 'status': 200}
     OR
@@ -42,9 +53,7 @@ def get_profile(account_id: int) -> dict:
         account_id (int): The ID of the account to update.
 
     Returns:
-        dict: {'username': username, 'name': name, 'height': height, 'age': age, 'sex': sex, 'message': message, "status": status}
-        OR
-        dict: {'data': {'username': username, 'name': name, 'height': height, 'age': age, 'sex': sex}, 'message': message, 'status': status}
+        dict: {'name': name, 'username': username, 'password_hash': password_hash, 'height': height, 'age': age, 'sex': sex, 'message': message, "status": status}
     """
     return {'data': {'name': "John Doe", 'height': 180.0, 'age': 30, 'sex': 1}, 'message': "Profile data retrieved successfully", 'status': 200}
 

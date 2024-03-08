@@ -1,10 +1,12 @@
 from database import db_config
 from utils import read_data_from_csv
-from utils.db_utils import insert_data
+from utils.db_utils import Database
+from flask import current_app
 
 # python -m scripts.insert_weeklytrainingdata
 
 def main():
+    db = current_app.db
     file_path = r'..\..\data\week_training_data_1.csv'
     query = """
             INSERT INTO weeklytrainingdata (height, age, sex, phase_type, initial_weight,
@@ -14,8 +16,11 @@ def main():
     """
     data = read_data_from_csv(file_path)
     print(f"Read data from file: {data}")
-    if insert_data(data, query, db_config):
-        print("Insert failed")
+    response = db.execute_query(query, data)
+    if response['status'] != 0:
+        print(f"Insert failed: {response['message']}")
+    else:
+        print("Insert successful")
 
 if __name__ == "__main__":
     main()

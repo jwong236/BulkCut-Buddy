@@ -1,7 +1,7 @@
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
-from flask import current_app
 from utils import *
 from server.api.actions import *
+
 
 #   RESOURCE FIELDS
 

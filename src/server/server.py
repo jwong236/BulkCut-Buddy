@@ -4,6 +4,8 @@ import os
 from server.api.endpoints import initialize_api
 from server.weight_projection_model import WeightProjectionModel
 import atexit
+from utils.db_utils import Database
+from database import db_config
 
 app = Flask(__name__)
 
@@ -74,24 +76,10 @@ def main():
     # 3.
     atexit.register(serialize_models_on_exit, weekly_model, monthly_model, weekly_model_path, monthly_model_path) # Serialize models on server close
     initialize_api(app) # Set resource endpoitns to flask app
+    app.db = Database(db_config)
     app.config['WEEKLY_MODEL'] = weekly_model
     app.config['MONTHLY_MODEL'] = monthly_model
     app.run(debug=True) # run server
-
-    # Profile's POST
-    # 1. Accept data from APi endpoints
-    # 2. Upload user data to database
-
-    # Profile's PUT
-    # 1. Accept data from API endpoints
-    # 2. Upload user data to database
-
-    # Profile's GET
-    # 1. Fetch user data from database
-    # 2. Clean data
-    # 3. Feed data into model
-    # 4. receive predicttion from model
-    # 5. Send prediction to frontend
 
 if __name__ == '__main__':
     main()
