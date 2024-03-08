@@ -26,8 +26,10 @@ class WeightProjectionModel:
             random_state (int): Controls the shuffling applied to the data before applying the split.
         """
         # Bodyfat percentage is not feasible
-        features = ['initial_weight', 'height', 'sex', 'phase_type',
-                    'active_calories_burned', 'resting_calories_burned', 'steps', 'hours_of_sleep', 'weight_change_rate', 
+        features = ['height', 'age', 'sex',
+                    'phase_type',
+                    'initial_weight', 'active_calories_burned', 'resting_calories_burned', 'steps', 'hours_of_sleep',
+                    'weight_change_rate', 
                     'daily_calorie_intake', 'daily_protein_intake']
         if self.mode == 0:
             X = df[features + ['week_count']]
