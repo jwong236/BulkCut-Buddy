@@ -1,6 +1,6 @@
 import mysql.connector
 
-def insert_training_data(data, query, db_config):
+def insert_data(data, query, db_config):
     """
     Inserts data specified by a query into a database.
 

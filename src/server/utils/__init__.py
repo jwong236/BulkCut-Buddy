@@ -25,7 +25,7 @@ def str_to_datatime(value):
     except ValueError:
         raise ValueError("Date must be in YYYY-MM-DD format")
     
-def read_training_data_from_csv(file_path):
+def read_data_from_csv(file_path):
     with open(file_path, mode='r', encoding='utf-8') as csv_file:
         csv_reader = csv.reader(csv_file)
         next(csv_reader)
