@@ -10,7 +10,7 @@ def insert_training_data(data, query, db_config):
         db_config (dict): Database connection info.
 
     Returns:
-        tuple: A message and a status code (0 for success, 1 for error).
+        int: Status code.
     """
     status = 0
     try:

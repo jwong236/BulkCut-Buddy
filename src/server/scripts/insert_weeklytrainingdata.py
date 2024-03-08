@@ -2,7 +2,7 @@ from database import db_config
 from utils import read_training_data_from_csv
 from utils.db_utils import insert_training_data
 
-# python -m scripts.insert_training_data
+# python -m scripts.insert_weeklytrainingdata
 
 def main():
     file_path = r'..\..\data\week_training_data_1.csv'
@@ -13,7 +13,9 @@ def main():
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
     """
     data = read_training_data_from_csv(file_path)
-    insert_training_data(data, query, db_config)
+    print(f"Read data from file: {data}")
+    if insert_training_data(data, query, db_config):
+        print("Insert failed")
 
 if __name__ == "__main__":
     main()
