@@ -64,8 +64,7 @@ def main():
     - Runs server
     """
     # 1.
-    parser = argparse.ArgumentParser(description="Start the Flask server with optional model initialization.")
-    parser = argparse.ArgumentParser(description="Manage weekly and monthly models.")
+    parser = argparse.ArgumentParser()
     parser.add_argument("--wnew", action="store_true", help="Train a new weekly model.")
     parser.add_argument("--mnew", action="store_true", help="Train a new monthly model.")
     args = parser.parse_args()
