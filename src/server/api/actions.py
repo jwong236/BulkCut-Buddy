@@ -1,27 +1,27 @@
-from utils import validate_password, encrypt_password
+from server.utils import get_db_config, validate_password, encrypt_password
 from flask import current_app
 
 # PROFILERESOURCE METHODS
 
-def create_profile(username: str, password: str, db_config) -> dict:
+def create_profile(username: str, password: str) -> dict:
     """
     Creates an account entry in database using arguments, returns accountID of new account
 
     Args:
         username (str): The username of the new user.
         password (str): The password for the new user (not pre-hashed).
-        db_config (dict): Database connection information.
 
     Returns:
         dict: {'account_id': account_id, 'message': message, "status": status}
     """
-
+    db_config = get_db_config()
     # Implement password validation
     if not validate_password(password):
         return {'message': 'Invalid password', 'status': 1}
 
     # Encrypt password using a secure algorithm
-    password_hash = create_password_hash(password)
+    password_hash = encrypt_password(password)
+    
 
     data = [(username, password_hash)]
     query = """
@@ -30,9 +30,9 @@ def create_profile(username: str, password: str, db_config) -> dict:
     """
 
     try:
-        response = current_app.db.execute_query(data, query, db_config)
-        if response['status'] == 0:  # Successful insertion
-            account_id = current_app.db.get_account_id(username, db_config)  # Fetch accountID
+        response = current_app.db.execute_query(query, data, db_config) #FAILING HERE
+        if response['status'] == 0:
+            account_id = current_app.db.get_account_id(username, db_config)
             response['account_id'] = account_id
     except Exception as e:
         print(f"Error creating profile: {str(e)}")

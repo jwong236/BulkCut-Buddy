@@ -5,7 +5,7 @@ from server.api.endpoints import initialize_api
 from server.weight_projection_model import WeightProjectionModel
 import atexit
 from utils.db_utils import Database
-from database import db_config
+from utils import get_db_config
 
 app = Flask(__name__)
 
@@ -13,34 +13,7 @@ weekly_model_path = "weekly_model.joblib"
 monthly_model_path = "monthly_model.joblib"
 
 
-def get_models(wnew, mnew):
-    """
-    Instantiates both weekly and monthly models. Uses already existing serialized one unless --wnew for weekly and/or --mnew for monthly is true, 
-    or if serialized model doesn't already exist. Models are trained upon instantiation
-    """
-    if wnew or not os.path.exists(weekly_model_path):
-        weekly_training_dataframe = query_weekly_training_dataframe() # TODO: Implement query_weekly_training_dataframe() which retrieves dataframe containing all training data
-        weekly_model = WeightProjectionModel(mode="weekly")
-        print("New weekly model created")
-        weekly_model.train(weekly_training_dataframe)
-        print("New weekly model trained")
-    else:
-        weekly_model = WeightProjectionModel(mode="weekly")
-        weekly_model.deserialize(weekly_model_path)
-        print("Weekly model deserialized.")
 
-    if mnew or not os.path.exists(monthly_model_path):
-        monthly_training_dataframe = query_monthly_training_dataframe() # TODO: Implement query_monthly_training_dataframe() which retrieves dataframe containing all training data
-        monthly_model = WeightProjectionModel(mode="monthly")
-        print("New monthly model created")
-        monthly_model.train(monthly_training_dataframe)
-        print("New monthly model trained")
-    else:
-        monthly_model = WeightProjectionModel(mode="monthly")
-        monthly_model.deserialize(monthly_model_path)
-        print("Monthly model deserialized.")
-
-    return weekly_model, monthly_model
 
 def serialize_models_on_exit(weekly_model, monthly_model, weekly_path, monthly_path):
     """
@@ -70,14 +43,15 @@ def main():
     args = parser.parse_args()
     
     # 2.
-    weekly_model, monthly_model = get_models(args.wnew, args.mnew)
+    #weekly_model, monthly_model = get_models(args.wnew, args.mnew)
 
     # 3.
-    atexit.register(serialize_models_on_exit, weekly_model, monthly_model, weekly_model_path, monthly_model_path) # Serialize models on server close
+    #atexit.register(serialize_models_on_exit, weekly_model, monthly_model, weekly_model_path, monthly_model_path) # Serialize models on server close
     initialize_api(app) # Set resource endpoitns to flask app
+    db_config = get_db_config()
     app.db = Database(db_config)
-    app.config['WEEKLY_MODEL'] = weekly_model
-    app.config['MONTHLY_MODEL'] = monthly_model
+    #app.config['WEEKLY_MODEL'] = weekly_model
+    #app.config['MONTHLY_MODEL'] = monthly_model
     app.run(debug=True) # run server
 
 if __name__ == '__main__':
