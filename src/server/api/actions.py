@@ -41,46 +41,100 @@ def create_profile(username: str, password: str) -> dict:
 
 def get_profile(account_id: int) -> dict:
     """
-    Retrieves basic profile data for a given account ID. 
-
-    Return dict should be {'data1': data1, 'data2': data2, 'message': "Profile data retrieved successfully", 'status': 200}
-    OR
-    {'data': {'name': "John Doe", 'height': 180.0, 'age': 30, 'sex': 1}}
-    whatevers easier, i dont really care, i am leaning more towards this^ one though
+    Retrieves basic profile data for a given account ID.
 
     Args:
-        account_id (int): The ID of the account to update.
+        account_id (int): The ID of the account.
 
     Returns:
-        dict: {'name': name, 'username': username, 'password_hash': password_hash, 'height': height, 'age': age, 'sex': sex, 'message': message, "status": status}
+        dict: Profile data and status message.
     """
-    return {'data': {'name': "John Doe", 'height': 180.0, 'age': 30, 'sex': 1}, 'message': "Profile data retrieved successfully", 'status': 200}
+    query = """
+        SELECT name, username, password_hash, height, age, sex
+        FROM profile
+        WHERE account_id = %s;
+    """
+    data = (account_id,)
+
+    try:
+        response = current_app.db.execute_query(query, data, fetch_one=True)
+        if response['data']:
+            profile_data = response['data']
+            return {
+                'data': {
+                    'name': profile_data[0],
+                    'username': profile_data[1],
+                    'password_hash': profile_data[2],
+                    'height': profile_data[3],
+                    'age': profile_data[4],
+                    'sex': profile_data[5]
+                },
+                'message': "Profile data retrieved successfully",
+                'status': 200
+            }
+        else:
+            return {'message': 'Profile not found', 'status': 404}
+    except Exception as e:
+        print(f"Error retrieving profile: {str(e)}")
+        return {'message': 'Failed to retrieve profile', 'status': 500}
 
 def upload_profile(account_id: int, name: str = None, height: float = None, age: int = None, sex: int = None) -> dict:
     """
-    Uploads the profile with basic profile data for a given account ID.
+    Finds the profile with the given account_id and updates it with the supplied data.
 
     Args:
         account_id (int): The ID of the account to update.
-        name (str): The new name of the user.
-        height (float): The new height of the user in cm.
-        age (int): The new age of the user.
-        sex (int): The new sex of the user (0 for female, 1 for male).
+        name (str, optional): The new name of the user.
+        height (float, optional): The new height of the user in cm.
+        age (int, optional): The new age of the user.
+        sex (int, optional): The new sex of the user (0 for female, 1 for male).
 
     Returns:
         dict: {'message': message, "status": status}
     """
-    return {'message': "Profile updated successfully", "status": 200}
+    query_parts = []
+    data = []
+
+    if name is not None:
+        query_parts.append("name = %s")
+        data.append(name)
+    if height is not None:
+        query_parts.append("height = %s")
+        data.append(height)
+    if age is not None:
+        query_parts.append("age = %s")
+        data.append(age)
+    if sex is not None:
+        query_parts.append("sex = %s")
+        data.append(sex)
+
+    if not query_parts:
+        return {'message': "No data provided to update", "status": 400}
+
+    query = "UPDATE profile SET " + ", ".join(query_parts) + " WHERE account_id = %s;"
+    data.append(account_id)
+
+    try:
+        response = current_app.db.execute_query(query, tuple(data))
+        # Assuming the execute_query method returns a response with a status key
+        if response['status'] == 0:  # Assuming 0 signifies success
+            return {'message': "Profile updated successfully", "status": 200}
+        else:
+            return {'message': "Failed to update profile", "status": response['status']}
+    except Exception as e:
+        print(f"Error updating profile: {str(e)}")
+        return {'message': 'Failed to update profile', 'status': 500}
+
 
 def update_profile(account_id: int, username: str, password_hash: str, name: str = None, 
-                        height: float = None, age: int = None, sex: int = None) -> dict:
+                   height: float = None, age: int = None, sex: int = None) -> dict:
     """
     Updates one or more basic profile data for a given account ID.
 
     Args:
         account_id (int): The ID of the account to update.
-        username (str, optional): The new username of profile
-        password_hash(str, optional): The new hashed password
+        username (str): The new username of the profile.
+        password_hash (str): The new hashed password.
         name (str, optional): The new name of the user.
         height (float, optional): The new height of the user in cm.
         age (int, optional): The new age of the user.
@@ -89,7 +143,31 @@ def update_profile(account_id: int, username: str, password_hash: str, name: str
     Returns:
         dict: {'message': message, "status": status}
     """
-    return {'message': "Account data updated successfully", "status": 200}
+    query_parts = ["username = %s", "password_hash = %s"]
+    data = [username, password_hash]
+
+    if name is not None:
+        query_parts.append("name = %s")
+        data.append(name)
+    if height is not None:
+        query_parts.append("height = %s")
+        data.append(height)
+    if age is not None:
+        query_parts.append("age = %s")
+        data.append(age)
+    if sex is not None:
+        query_parts.append("sex = %s")
+        data.append(sex)
+
+    query = "UPDATE profile SET " + ", ".join(query_parts) + " WHERE account_id = %s;"
+    data.append(account_id)
+
+    try:
+        current_app.db.execute_query(query, tuple(data))
+        return {'message': "Account data updated successfully", "status": 200}
+    except Exception as e:
+        return {'message': f"Failed to update profile: {e}", "status": 500}
+
 
 def delete_profile(account_id: int) -> dict:
     """
@@ -101,7 +179,14 @@ def delete_profile(account_id: int) -> dict:
     Returns:
         dict: {'message': message, "status": status}
     """
-    return {'message': "Account data deleted successfully", "status": 200}
+    query = "DELETE FROM profile WHERE account_id = %s;"
+
+    try:
+        current_app.db.execute_query(query, (account_id,))
+        return {'message': "Account data deleted successfully", "status": 200}
+    except Exception as e:
+        return {'message': f"Failed to delete profile: {e}", "status": 500}
+
 
 
 

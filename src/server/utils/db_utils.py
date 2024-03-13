@@ -16,17 +16,17 @@ class Database:
             cursor = cnx.cursor()
             if data:
                 if isinstance(data[0], tuple):
-                    cursor.executemany(query, data)
+                    cursor.executemany(query, data) # If data is a list of tuples, method will execute query for each tuple in the list
                 else:
-                    cursor.execute(query, data)
+                    cursor.execute(query, data) # If data is a single tuple it will execute query on it
             else:
                 cursor.execute(query)
 
             if query.strip().upper().startswith("SELECT"):
                 if fetch_one:
-                    response['data'] = cursor.fetchone()
+                    response['data'] = cursor.fetchone() # If a query returns hundreds of rows, fetchone would return1
                 else:
-                    response['data'] = cursor.fetchall()
+                    response['data'] = cursor.fetchall() # If a query returns hudnreds of rows, fetchall would return all
 
             cnx.commit()
         except mysql.connector.Error as err:
