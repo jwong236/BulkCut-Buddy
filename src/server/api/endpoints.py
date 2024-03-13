@@ -1,6 +1,6 @@
 from flask_restful import Api, Resource, reqparse, fields, marshal_with
 from utils import *
-from server.api.actions import *
+from api.actions import * #why this doesnt work
 
 
 #   RESOURCE FIELDS
@@ -75,6 +75,7 @@ def initialize_api(app):
     api.add_resource(DailyEntryResource, '/api/dailyentry')
     api.add_resource(PhaseResources, '/api/phase')
     api.add_resource(ProjectionResource, '/api/projection')
+    print("Initialize success")
 
 #  RESOURCE CLASSES
 

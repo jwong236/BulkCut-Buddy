@@ -1,4 +1,4 @@
-from server.utils import get_db_config, validate_password, encrypt_password
+from utils import validate_password, encrypt_password
 from flask import current_app
 
 # PROFILERESOURCE METHODS
@@ -14,7 +14,6 @@ def create_profile(username: str, password: str) -> dict:
     Returns:
         dict: {'account_id': account_id, 'message': message, "status": status}
     """
-    db_config = get_db_config()
     # Implement password validation
     if not validate_password(password):
         return {'message': 'Invalid password', 'status': 1}
@@ -30,9 +29,9 @@ def create_profile(username: str, password: str) -> dict:
     """
 
     try:
-        response = current_app.db.execute_query(query, data, db_config) #FAILING HERE
+        response = current_app.db.execute_query(query, data)
         if response['status'] == 0:
-            account_id = current_app.db.get_account_id(username, db_config)
+            account_id = current_app.db.get_account_id(username)
             response['account_id'] = account_id
     except Exception as e:
         print(f"Error creating profile: {str(e)}")
