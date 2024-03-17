@@ -8,9 +8,12 @@
 import SwiftUI
 
 struct enter_data: View {
+    @State private var showingPredictionData = false
+    @State private var goal = ""
     @State private var calorie_intake = ""
     @State private var calories_burned = ""
     @State private var protein_intake = ""
+    @State private var steps_taken = ""
     var body: some View {
         NavigationStack {
             ZStack {
@@ -27,12 +30,17 @@ struct enter_data: View {
                         .font(.largeTitle)
                         .bold()
                         .padding()
+                    TextField("Goal: (bulking/cutting)", text: $goal)
+                        .padding()
+                        .frame(width: 300, height: 50)
+                        .background(Color.black.opacity(0.05))
+                        .cornerRadius(10)
                     TextField("Calories consumed", text: $calorie_intake)
                         .padding()
                         .frame(width: 300, height: 50)
                         .background(Color.black.opacity(0.05))
                         .cornerRadius(10)
-                    TextField("Calories burned", text: $calories_burned)
+                    TextField("Calories burned (exercise)", text: $calories_burned)
                         .padding()
                         .frame(width: 300, height: 50)
                         .background(Color.black.opacity(0.05))
@@ -42,31 +50,27 @@ struct enter_data: View {
                         .frame(width: 300, height: 50)
                         .background(Color.black.opacity(0.05))
                         .cornerRadius(10)
+                    TextField("Steps taken", text: $steps_taken)
+                        .padding()
+                        .frame(width: 300, height: 50)
+                        .background(Color.black.opacity(0.05))
+                        .cornerRadius(10)
                     Button("Enter") {
-                        push_data(calorie_intake: calorie_intake, calories_burn: calories_burned, protein_intake: protein_intake)
+                        showingPredictionData = true
                     }
                     .foregroundColor(.white)
                     .frame(width: 300, height: 50)
                     .background(Color.blue)
                     .cornerRadius(10)
+                    
+                    NavigationLink(destination: prediction(goal: .constant(goal.lowercased()), c_in: .constant(Double(calorie_intake) ?? 0), c_out: .constant(Double(calories_burned) ?? 0), protein: .constant(Double(protein_intake) ?? 0), steps: .constant(Double(steps_taken) ?? 0)), isActive: $showingPredictionData) {
+                        EmptyView()
+                    }
                 }
             }
         }
         
     }
-    func push_data(calorie_intake: String, calories_burn: String, protein_intake: String) {
-        //converting the strings to ints
-        let c_in = Int(calorie_intake) ?? 0
-        let c_burn = Int(calories_burn) ?? 0
-        let p_in = Int(protein_intake) ?? 0
-        //YOUR CODE HERE
-        //
-        //
-        //
-        //
-        
-    }
-    
 }
 
 #Preview {
